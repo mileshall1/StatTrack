@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Saved Games - StatTrack</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="nav">
+    <a href="index.html">StatTrack📊</a>
+    <a href="addPlayerGame.html">Add Game</a>
+    <a href="saved-games.html">Saved Games</a>
+    <a href="https://github.com/mileshall4/stattrack" target="_blank">
+      <img src="/public/gitwhite.png" alt="GitHub">
+    </a>
+  </div>
+
+  <div class="title">
+    <h1>Saved Games</h1>
+  </div>
+
+  <div class="saved-wrap">
+    <div class="saved-actions">
+      <a class="button" href="addPlayerGame.html">ADD ANOTHER</a>
+      <button class="button" id="clearAllBtn">CLEAR ALL</button>
+    </div>
+
+    <div id="emptyMsg" class="empty-msg" style="display:none;">
+      No saved games yet. Add one on the Add Game page.
+    </div>
+
+    <div class="table-wrap">
+      <table class="saved-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Player</th>
+            <th>Opp</th>
+            <th>PTS</th>
+            <th>REB</th>
+            <th>AST</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="gamesBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const body = document.getElementById("gamesBody");
+    const emptyMsg = document.getElementById("emptyMsg");
+    const clearAllBtn = document.getElementById("clearAllBtn");
+
+    const getGames = () => {
+      try { return JSON.parse(localStorage.getItem("stattrack_games")) || []; }
+      catch { return []; }
+    };
+
+    const setGames = (games) => {
+      localStorage.setItem("stattrack_games", JSON.stringify(games));
+    };
+
+    const render = () => {
+      const games = getGames();
+      body.innerHTML = "";
+
+      if (!games.length) {
+        emptyMsg.style.display = "block";
+        return;
+      } else {
+        emptyMsg.style.display = "none";
+      }
+
+      for (const g of games) {
+        const tr = document.createElement("tr");
+
+        const dateCell = document.createElement("td");
+        dateCell.setAttribute("data-label", "Date");
+        dateCell.textContent = g.date || "";
+
+        const playerCell = document.createElement("td");
+        playerCell.setAttribute("data-label", "Player");
+        playerCell.textContent = g.player;
+
+        const oppCell = document.createElement("td");
+        oppCell.setAttribute("data-label", "Opp");
+        oppCell.textContent = g.opp;
+
+        const ptsCell = document.createElement("td");
+        ptsCell.setAttribute("data-label", "PTS");
+        ptsCell.textContent = g.pts;
+
+        const rebCell = document.createElement("td");
+        rebCell.setAttribute("data-label", "REB");
+        rebCell.textContent = g.reb;
+
+        const astCell = document.createElement("td");
+        astCell.setAttribute("data-label", "AST");
+        astCell.textContent = g.ast;
+
+        const delCell = document.createElement("td");
+        delCell.setAttribute("data-label", "");
+        const btn = document.createElement("button");
+        btn.textContent = "DELETE";
+        btn.className = "mini-btn";
+        btn.addEventListener("click", () => {
+          const updated = getGames().filter(x => x.id !== g.id);
+          setGames(updated);
+          render();
+        });
+        delCell.appendChild(btn);
+
+        tr.appendChild(dateCell);
+        tr.appendChild(playerCell);
+        tr.appendChild(oppCell);
+        tr.appendChild(ptsCell);
+        tr.appendChild(rebCell);
+        tr.appendChild(astCell);
+        tr.appendChild(delCell);
+
+        body.appendChild(tr);
+      }
+    };
+
+    clearAllBtn.addEventListener("click", () => {
+      localStorage.removeItem("stattrack_games");
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
