@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Player Game</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <!--NAVBAR SECTION-->
+    <div class="nav">
+        <a href="index.html">StatTrack📊</a>
+        <a href="addPlayerGame.html">Add Game</a>
+        <a href="saved-games.html">Saved Games</a>
+        <a href="https://github.com/mileshall4/stattrack" target="_blank">
+        <img src="/public/gitwhite.png" alt="GitHub">
+        </a>
+    </div>
+
+    <div class="title">
+      <h1>Add Player Game</h1>
+    </div>
+
+    <form id="gameForm" class="form-container">
+      <input type="text" id="player" placeholder="Player Name" required>
+      <input type="date" id="date" required>
+      <input type="text" id="opp" placeholder="Opponent (e.g. LAL)" required>
+      <input type="number" id="pts" placeholder="Points" required>
+      <input type="number" id="reb" placeholder="Rebounds" required>
+      <input type="number" id="ast" placeholder="Assists" required>
+      <button type="submit" class="button">ADD GAME</button>
+    </form>
+
+    <script>
+      const form = document.getElementById("gameForm");
+
+      const loadGames = () => {
+        const raw = localStorage.getItem("stattrack_games");
+        return raw ? JSON.parse(raw) : [];
+      };
+
+      const saveGames = (games) => {
+        localStorage.setItem("stattrack_games", JSON.stringify(games));
+      };
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const game = {
+          id: Date.now(),
+          player: document.getElementById("player").value.trim(),
+          date: document.getElementById("date").value,
+          opp: document.getElementById("opp").value.trim().toUpperCase().slice(0, 3),
+          pts: Number(document.getElementById("pts").value),
+          reb: Number(document.getElementById("reb").value),
+          ast: Number(document.getElementById("ast").value)
+        };
+
+        const games = loadGames();
+        games.unshift(game);
+        saveGames(games);
+
+        form.reset();
+        window.location.href = "savedGames.html";
+      });
+    </script>
+  </body>
+</html>
