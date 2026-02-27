@@ -60,3 +60,10 @@
     width: 100%;
     margin-bottom: 50px;
 }
+
+.nba {
+    background-image: linear-gradient(to right, #1D428A, #C8102E);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+}
