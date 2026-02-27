@@ -1,8 +1,14 @@
+body {
+    background-image: url(public/landingpage2.png);
+    background-size: cover;
+}
+
 *{
     font-family: 'Inter', sans-serif;
+}
+
+h1{
     color: white;
-    background-color: black;
-    background-color: linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(255,255,255,1) 100%);
 }
 
 .nav {
@@ -18,6 +24,7 @@
     text-decoration: none;
     font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
     margin-bottom: 120px;
+    color: white;
 }
 
 .nav img {
@@ -66,4 +73,36 @@
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
+}
+
+.form-container {
+    diplay: flex;
+    flex-direction: column;
+    width: 400px;
+    margin: 0 auto;
+    gap: 20px;
+}
+.form-container input {
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid white;
+    background-color: black;
+    color: blue;
+}
+
+.form-container input::placeholder {
+    color: grey;
+}
+
+.form-container button {
+    margin-top: 20px;
+}
+
+.table-wrap {
+    color: white;
+}
+
+.empty-msg {
+    color: white
 }
