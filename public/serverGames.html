@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StatTrack - Server Games</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+  </head>
+  <body>
+    <div class="nav">
+      <a href="/index.html">📊StatTrack</a>
+      <a href="/public/addGames.html">Add Game</a>
+      <a href="/public/serverGames.html">Saved Games</a>
+      <a href="https://github.com/mileshall4/stattrack" target="_blank">
+        <img src="/public/gitwhite.png" alt="GitHub">
+      </a>
+    </div>
+
+    <h1 class="page-title">Saved NBA Game Items (REST GET)</h1>
+
+    <div class="card">
+      <button id="clearGamesBtn" class="button" type="button">CLEAR ALL</button>
+      <p id="status" class="status">Loading data from /api/games...</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Date</th>
+              <th>Player</th>
+              <th>Opponent</th>
+              <th>PTS</th>
+              <th>REB</th>
+              <th>AST</th>
+            </tr>
+          </thead>
+          <tbody id="gamesBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      const statusEl = document.getElementById("status");
+      const gamesBody = document.getElementById("gamesBody");
+      const clearGamesBtn = document.getElementById("clearGamesBtn");
+
+      const buildApiUrl = (path) => {
+        const isLocalExpress = window.location.protocol.startsWith("http") && window.location.port === "3000";
+        if (isLocalExpress) {
+          return path;
+        }
+        return `http://localhost:3000${path}`;
+      };
+
+      async function loadGames() {
+        try {
+          const response = await fetch(buildApiUrl("/api/games"));
+          if (!response.ok) {
+            throw new Error("Request failed");
+          }
+
+          const games = await response.json();
+          gamesBody.innerHTML = "";
+
+          for (const game of games) {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${game.id}</td>
+              <td>${game.date}</td>
+              <td>${game.player}</td>
+              <td>${game.opponent}</td>
+              <td>${game.points}</td>
+              <td>${game.rebounds}</td>
+              <td>${game.assists}</td>
+            `;
+            gamesBody.appendChild(row);
+          }
+
+          statusEl.textContent = `Loaded ${games.length} items.`;
+        } catch (error) {
+          statusEl.textContent = "Unable to load server data.";
+        }
+      }
+
+      clearGamesBtn.addEventListener("click", async () => {
+        const shouldClear = window.confirm("Clear all saved games?");
+        if (!shouldClear) {
+          return;
+        }
+
+        try {
+          let response = await fetch(buildApiUrl("/api/games"), { method: "DELETE" });
+
+          if (!response.ok) {
+            response = await fetch(buildApiUrl("/api/games/clear"), { method: "POST" });
+          }
+
+          if (!response.ok) {
+            throw new Error("Clear request failed");
+          }
+
+          await loadGames();
+          statusEl.textContent = "All saved games were cleared.";
+        } catch {
+          statusEl.textContent = "Unable to clear saved games. Make sure Express is running on http://localhost:3000.";
+        }
+      });
+
+      loadGames();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>StatTrack - Saved</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/png" sizes="32x50" href="public/logo.png">
+</head>
+<body>
+
+  <div class="nav">
+      <a href="/index.html">📊StatTrack</a>
+      <a href="/public/addGames.html">Add Game</a>
+      <a href="/public/serverGames.html">Saved Games</a>
+      <a href="https://github.com/mileshall1/StatTrack" target="_blank">
+        <img src="/public/gitwhite.png" alt="GitHub">
+      </a>
+    </div>
+
+  <div class="title">
+    <h1>Add Games</h1>
+  </div>
+
+  <form id="gameForm" class="form-container">
+    <input type="text" id="player" placeholder="Player Name" required>
+    <input type="date" id="date" required>
+    <input type="text" id="opponent" placeholder="Opponent (e.g. LAL)" required>
+    <input type="number" id="points" placeholder="Points" required>
+    <input type="number" id="rebounds" placeholder="Rebounds" required>
+    <input type="number" id="assists" placeholder="Assists" required>
+    <button type="submit" class="button">ADD GAME</button>
+  </form>
+
+  <div class="saved-wrap">
+    <div id="emptyMsg" class="empty-msg" style="display:none;">
+      No saved games yet.
+    </div>
+
+    <div class="table-wrap">
+      <table class="saved-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Player</th>
+            <th>Opponent</th>
+            <th>PTS</th>
+            <th>REB</th>
+            <th>AST</th>
+          </tr>
+        </thead>
+        <tbody id="gamesBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("gameForm");
+    const body = document.getElementById("gamesBody");
+    const emptyMsg = document.getElementById("emptyMsg");
+
+    const buildApiUrl = (path) => {
+      const isLocalExpress = window.location.protocol.startsWith("http") && window.location.port === "3000";
+      if (isLocalExpress) {
+        return path;
+      }
+      return `http://localhost:3000${path}`;
+    };
+
+    const render = async () => {
+      try {
+        const response = await fetch(buildApiUrl("/api/games"));
+        if (!response.ok) {
+          throw new Error("Failed to load games");
+        }
+
+        const games = await response.json();
+        body.innerHTML = "";
+
+        if (!games.length) {
+          emptyMsg.style.display = "block";
+          return;
+        }
+
+        emptyMsg.style.display = "none";
+
+        for (const g of games) {
+        const tr = document.createElement("tr");
+
+        const dateCell = document.createElement("td");
+        dateCell.setAttribute("data-label", "Date");
+        dateCell.textContent = g.date || "";
+
+        const playerCell = document.createElement("td");
+        playerCell.setAttribute("data-label", "Player");
+        playerCell.textContent = g.player;
+
+        const oppCell = document.createElement("td");
+        oppCell.setAttribute("data-label", "Opponent");
+        oppCell.textContent = g.opponent;
+
+        const ptsCell = document.createElement("td");
+        ptsCell.setAttribute("data-label", "PTS");
+        ptsCell.textContent = g.points;
+
+        const rebCell = document.createElement("td");
+        rebCell.setAttribute("data-label", "REB");
+        rebCell.textContent = g.rebounds;
+
+        const astCell = document.createElement("td");
+        astCell.setAttribute("data-label", "AST");
+        astCell.textContent = g.assists;
+
+        tr.appendChild(dateCell);
+        tr.appendChild(playerCell);
+        tr.appendChild(oppCell);
+        tr.appendChild(ptsCell);
+        tr.appendChild(rebCell);
+        tr.appendChild(astCell);
+
+        body.appendChild(tr);
+      }
+      } catch {
+        body.innerHTML = "";
+        emptyMsg.style.display = "block";
+        emptyMsg.textContent = "Unable to load saved games.";
+      }
+    };
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const payload = {
+        player: document.getElementById("player").value.trim(),
+        date: document.getElementById("date").value,
+        opponent: document.getElementById("opponent").value.trim(),
+        points: Number(document.getElementById("points").value),
+        rebounds: Number(document.getElementById("rebounds").value),
+        assists: Number(document.getElementById("assists").value)
+      };
+
+      let response;
+      try {
+        response = await fetch(buildApiUrl("/api/games"), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+      } catch {
+        alert("Could not connect to API. Make sure your Express server is running on http://localhost:3000.");
+        return;
+      }
+
+      if (!response.ok) {
+        alert("Could not save game. Please try again.");
+        return;
+      }
+
+      form.reset();
+      render();
+    });
+
+    render();
+  </script>
+  <!--FOOTER-->
+  <footer class="footer" style="color: white;">
+      <p>© 2025 StatTrack - Built by Kelechi & Miles</p>
+      <a href="https://github.com/mileshall1/StatTrack" target="_blank">
+          <img src="/public/gitwhite.png" alt="GitHub" width="50">
+      </a>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "stattrack-static-server",
+  "version": "1.0.0",
+  "description": "Node.js Express static server with REST GET endpoint",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

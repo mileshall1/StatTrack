@@ -7,39 +7,81 @@
         <link rel="icon" type="image/png" sizes="32x32" href="public/logo.png">
     </head>
     <body>
-        <section>
+        <section class="hero-section">
         <!--NAVBAR SECTION-->
-        <div class="nav">
-            <a href="index.html">StatTrack📊</a>
-            <a href="addPlayerGame.html">Add Game</a>
-            <a href="saved-games.html">Saved Games</a>
-            <a href="https://github.com/mileshall4/stattrack" target="_blank">
-            <img src="/public/gitwhite.png" alt="GitHub">
-            </a>
-        </div>
+            <div class="nav">
+            <a href="/index.html">📊StatTrack</a>
+      <a href="/public/addGames.html">Add Game</a>
+      <a href="/public/serverGames.html">Saved Games</a>
+      <a href="https://github.com/mileshall1/StatTrack" target="_blank">
+        <img src="/public/gitwhite.png" alt="GitHub">
+      </a>
+            </div>
 
         <!--LANDING PAGE (1)-->
-        <div>
+        <div class="hero">
             <div class="title">
                 <h1>StatTrack: Your Ultimate <span class="nba">NBA</span> Stats Dashboard</h1>
             </div>
             
-            <h2 style="font-size: 1.4rem; text-align: center; font-weight: 300; 
-            color: rgb(187, 186, 186); margin-bottom: 70px;">
+            <h2 class="hero-subtitle">
                 Explore comprehensive NBA statistics, player performance insights, and team analytics all in one place.
             </h2>
 
-            <a class="button" style="background-image: linear-gradient(to right, #1D428A, #C8102E); color: white;" href="/search.html">SEARCH</a>
+            <a class="button hero-cta" href="/public/addGames.html">ADD GAME</a>
         </div>
         </section>
 
-        <!-- <section>
-            <div id="features"class="features">
-                <h1 clas="title">
-                    Features
-                </h1>
+        <section class="features-section">
+            <div class="features-header">
+                <h2>Features</h2>
             </div>
-        </section> -->
+
+            <div class="features-grid">
+                <article class="feature-card">
+                    <h3>Add Games Fast</h3>
+                    <p>Log player stats in seconds with a simple form for points, rebounds, and assists.</p>
+                </article>
+
+                <article class="feature-card">
+                    <h3>Save with REST API</h3>
+                    <p>Store game data in your JSON dataset through Express REST endpoints.</p>
+                </article>
+
+                <article class="feature-card">
+                    <h3>View All History</h3>
+                    <p>Review saved games in one place and quickly track recent stat entries.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="team-section">
+            <div class="team-header">
+                <h2>Meet the Team</h2>
+            </div>
+
+            <div class="team-grid">
+                <article class="team-card">
+                    <img src="/images/kelechi.png" alt="Kelechi" >
+                    <h3>Kelechi</h3>
+                    <p>Co-Founder</p>
+                </article>
+
+                <article class="team-card">
+                    <img src="/images/miles.png" alt="Miles">
+                    <h3>Miles</h3>
+                    <p>Co-Founder</p>
+                </article>
+            </div>
+        </section>
+
+            <!--FOOTER-->
+            <footer class="footer" style="color: white;">
+                <p>© 2025 StatTrack - Built by Kelechi & Miles</p>
+                <a href="https://github.com/mileshall4/stattrack" target="_blank">
+                    <img src="/public/gitwhite.png" alt="GitHub" width="50">
+                </a>
+            </footer>
 
         <!--LANDING PAGE (2)-->
     </body>
