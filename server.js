@@ -1,3 +1,5 @@
+const db = require("./model/DbConnection")
+db.connect();
 const express = require("express");
 const path = require("path");
 const gameCont = require("./controller/UserController");

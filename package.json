@@ -4,16 +4,15 @@
   "description": "Node.js Express static server with REST GET endpoint",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "test": "jest",
+    "coverage": "jest --coverage"
   },
   "dependencies": {
-    "express": "^4.21.2"
+    "dotenv": "^17.4.2",
+    "express": "^4.21.2",
+    "mongoose": "^9.4.1"
   },
   "devDependencies": {
     "jest": "^30.3.0"
-  },
-  "scripts": { 
-    "test": "jest",
-    "coverage": "jest --coverage"
-  } 
+  }
 }

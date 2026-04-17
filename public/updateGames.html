@@ -23,7 +23,7 @@
   </div>
 
   <form id="updateForm" class="form-container">
-    <input type="number" id="id" placeholder="Game ID" required>
+   <input type="text" id="id" placeholder="Game ID" readonly required>
     <input type="text" id="player" placeholder="Player Name" required>
     <input type="date" id="date" required>
     <input type="text" id="opponent" placeholder="Opponent (e.g. LAL)" required>
@@ -57,146 +57,175 @@
   </div>
 
   <script>
-    const form = document.getElementById("updateForm");
-    const body = document.getElementById("gamesBody");
-    const emptyMsg = document.getElementById("emptyMsg");
+  const form = document.getElementById("updateForm");
+  const body = document.getElementById("gamesBody");
+  const emptyMsg = document.getElementById("emptyMsg");
 
-    const buildApiUrl = (path) => {
-      const isLocalExpress = window.location.protocol.startsWith("http") && window.location.port === "3000";
-      if (isLocalExpress) {
-        return path;
-      }
-      return `http://localhost:3000${path}`;
-    };
+  const idInput = document.getElementById("id");
+  const playerInput = document.getElementById("player");
+  const dateInput = document.getElementById("date");
+  const opponentInput = document.getElementById("opponent");
+  const pointsInput = document.getElementById("points");
+  const reboundsInput = document.getElementById("rebounds");
+  const assistsInput = document.getElementById("assists");
 
-    const render = async () => {
-      try {
-        const response = await fetch(buildApiUrl("/api/games"));
-        if (!response.ok) {
-          throw new Error("Failed to load games");
-        }
+  const buildApiUrl = (path) => {
+    const isLocalExpress = window.location.protocol.startsWith("http") && window.location.port === "3000";
+    if (isLocalExpress) {
+      return path;
+    }
+    return `http://localhost:3000${path}`;
+  };
 
-        const games = await response.json();
-        body.innerHTML = "";
+  function fillForm(game) {
+    idInput.value = game._id || "";
+    playerInput.value = game.player || "";
+    dateInput.value = game.date || "";
+    opponentInput.value = game.opponent || "";
+    pointsInput.value = game.points ?? 0;
+    reboundsInput.value = game.rebounds ?? 0;
+    assistsInput.value = game.assists ?? 0;
+  }
 
-        if (!games.length) {
-          emptyMsg.style.display = "block";
-          return;
-        }
-
-        emptyMsg.style.display = "none";
-
-        for (const g of games) {
-          const tr = document.createElement("tr");
-
-          const idCell = document.createElement("td");
-          idCell.setAttribute("data-label", "ID");
-          idCell.textContent = g.id;
-
-          const dateCell = document.createElement("td");
-          dateCell.setAttribute("data-label", "Date");
-          dateCell.textContent = g.date || "";
-
-          const playerCell = document.createElement("td");
-          playerCell.setAttribute("data-label", "Player");
-          playerCell.textContent = g.player;
-
-          const oppCell = document.createElement("td");
-          oppCell.setAttribute("data-label", "Opponent");
-          oppCell.textContent = g.opponent;
-
-          const ptsCell = document.createElement("td");
-          ptsCell.setAttribute("data-label", "PTS");
-          ptsCell.textContent = g.points;
-
-          const rebCell = document.createElement("td");
-          rebCell.setAttribute("data-label", "REB");
-          rebCell.textContent = g.rebounds;
-
-          const astCell = document.createElement("td");
-          astCell.setAttribute("data-label", "AST");
-          astCell.textContent = g.assists;
-
-          tr.appendChild(idCell);
-          tr.appendChild(dateCell);
-          tr.appendChild(playerCell);
-          tr.appendChild(oppCell);
-          tr.appendChild(ptsCell);
-          tr.appendChild(rebCell);
-          tr.appendChild(astCell);
-
-          body.appendChild(tr);
-        }
-      } catch {
-        body.innerHTML = "";
-        emptyMsg.style.display = "block";
-        emptyMsg.textContent = "Unable to load saved games.";
-      }
-    };
-
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-
-      const id = document.getElementById("id").value;
-      const player = document.getElementById("player").value.trim();
-      const date = document.getElementById("date").value;
-      const opponent = document.getElementById("opponent").value.trim();
-      const points = Number(document.getElementById("points").value);
-      const rebounds = Number(document.getElementById("rebounds").value);
-      const assists = Number(document.getElementById("assists").value);
-
-      if (!id) {
-        alert("Please enter a game ID.");
-        return;
-      }
-
-      if (!player || !date || !opponent) {
-        alert("Please fill out all fields.");
-        return;
-      }
-
-      if (points < 0 || rebounds < 0 || assists < 0) {
-        alert("Stats cannot be negative.");
-        return;
-      }
-
-      const payload = {
-        player: player,
-        date: date,
-        opponent: opponent,
-        points: points,
-        rebounds: rebounds,
-        assists: assists
-      };
-
-      let response;
-      try {
-        response = await fetch(buildApiUrl(`/api/games/${id}`), {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-      } catch {
-        alert("Could not connect to API. Make sure your Express server is running on http://localhost:3000.");
-        return;
-      }
-
-      if (response.status === 404) {
-        alert("Game ID not found.");
-        return;
-      }
-
+  const render = async () => {
+    try {
+      const response = await fetch(buildApiUrl("/api/games"));
       if (!response.ok) {
-        alert("Could not update game. Please try again.");
+        throw new Error("Failed to load games");
+      }
+
+      const games = await response.json();
+      body.innerHTML = "";
+
+      if (!games.length) {
+        emptyMsg.style.display = "block";
         return;
       }
 
-      form.reset();
-      render();
-    });
+      emptyMsg.style.display = "none";
 
+      for (const g of games) {
+        const tr = document.createElement("tr");
+        tr.style.cursor = "pointer";
+
+        tr.addEventListener("click", () => {
+          fillForm(g);
+
+          document.querySelectorAll("#gamesBody tr").forEach(row => {
+            row.style.backgroundColor = "";
+          });
+          tr.style.backgroundColor = "rgba(255,255,255,0.12)";
+        });
+
+        const idCell = document.createElement("td");
+        idCell.setAttribute("data-label", "ID");
+        idCell.textContent = g._id || "";
+
+        const dateCell = document.createElement("td");
+        dateCell.setAttribute("data-label", "Date");
+        dateCell.textContent = g.date || "";
+
+        const playerCell = document.createElement("td");
+        playerCell.setAttribute("data-label", "Player");
+        playerCell.textContent = g.player || "";
+
+        const oppCell = document.createElement("td");
+        oppCell.setAttribute("data-label", "Opponent");
+        oppCell.textContent = g.opponent || "";
+
+        const ptsCell = document.createElement("td");
+        ptsCell.setAttribute("data-label", "PTS");
+        ptsCell.textContent = g.points ?? 0;
+
+        const rebCell = document.createElement("td");
+        rebCell.setAttribute("data-label", "REB");
+        rebCell.textContent = g.rebounds ?? 0;
+
+        const astCell = document.createElement("td");
+        astCell.setAttribute("data-label", "AST");
+        astCell.textContent = g.assists ?? 0;
+
+        tr.appendChild(idCell);
+        tr.appendChild(dateCell);
+        tr.appendChild(playerCell);
+        tr.appendChild(oppCell);
+        tr.appendChild(ptsCell);
+        tr.appendChild(rebCell);
+        tr.appendChild(astCell);
+
+        body.appendChild(tr);
+      }
+    } catch {
+      body.innerHTML = "";
+      emptyMsg.style.display = "block";
+      emptyMsg.textContent = "Unable to load saved games.";
+    }
+  };
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const id = idInput.value;
+    const player = playerInput.value.trim();
+    const date = dateInput.value;
+    const opponent = opponentInput.value.trim();
+    const points = Number(pointsInput.value);
+    const rebounds = Number(reboundsInput.value);
+    const assists = Number(assistsInput.value);
+
+    if (!id) {
+      alert("Please click a game row first.");
+      return;
+    }
+
+    if (!player || !date || !opponent) {
+      alert("Please fill out all fields.");
+      return;
+    }
+
+    if (points < 0 || rebounds < 0 || assists < 0) {
+      alert("Stats cannot be negative.");
+      return;
+    }
+
+    const payload = {
+      player,
+      date,
+      opponent,
+      points,
+      rebounds,
+      assists
+    };
+
+    let response;
+    try {
+      response = await fetch(buildApiUrl(`/api/games/${id}`), {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+    } catch {
+      alert("Could not connect to API. Make sure your Express server is running on http://localhost:3000.");
+      return;
+    }
+
+    if (response.status === 404) {
+      alert("Game ID not found.");
+      return;
+    }
+
+    if (!response.ok) {
+      alert("Could not update game. Please try again.");
+      return;
+    }
+
+    alert("Game updated successfully.");
+    form.reset();
     render();
-  </script>
+  });
+
+  render();
+</script>
 
   <footer class="footer" style="color: white;">
     <p>© 2025 StatTrack - Built by Kelechi & Miles</p>

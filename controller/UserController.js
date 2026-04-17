@@ -1,14 +1,13 @@
-const dao = require("../model/GameDaoMem");
+const dao = require("../model/GameDaoMongoose");
 
-exports.getAll = function (req, res) {
+exports.getAll = async function(req, res) {
   res.status(200);
-  res.send(dao.readAll());
-  res.end();
+  res.send(await dao.readAll());
 };
 
-exports.get = function (req, res) {
-  const gid = parseInt(req.params.gid);
-  const game = dao.read(gid);
+exports.get = async function(req, res) {
+  const gid = req.params.gid;
+  const game = await dao.read(gid);
 
   if (game != null) {
     res.status(200);
@@ -17,11 +16,9 @@ exports.get = function (req, res) {
     res.status(404);
     res.send({ msg: "Game with this ID does not exist" });
   }
-
-  res.end();
 };
 
-exports.postCreate = function (req, res) {
+exports.postCreate = async function(req, res) {
   const player = req.body.player;
   const date = req.body.date;
   const opponent = req.body.opponent;
@@ -44,13 +41,13 @@ exports.postCreate = function (req, res) {
     assists
   };
 
-  const created = dao.create(newGame);
+  const created = await dao.create(newGame);
   res.status(201);
   res.send(created);
 };
 
-exports.putUpdate = function (req, res) {
-  const gid = parseInt(req.params.gid);
+exports.putUpdate = async function(req, res) {
+  const gid = req.params.gid;
 
   const updatedGame = {
     id: gid,
@@ -62,7 +59,7 @@ exports.putUpdate = function (req, res) {
     assists: Number(req.body.assists) || 0
   };
 
-  const result = dao.update(updatedGame);
+  const result = await dao.update(updatedGame);
 
   if (result != null) {
     res.status(200);
@@ -73,9 +70,9 @@ exports.putUpdate = function (req, res) {
   }
 };
 
-exports.getDelete = function (req, res) {
-  const gid = parseInt(req.params.gid);
-  const deleted = dao.del(gid);
+exports.getDelete = async function(req, res) {
+  const gid = req.params.gid;
+  const deleted = await dao.del(gid);
 
   if (deleted != null) {
     res.status(200);
