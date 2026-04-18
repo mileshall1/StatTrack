@@ -9,19 +9,18 @@
   </head>
   <body>
     <div class="nav">
-    <a href="/index.html">📊StatTrack</a>
-    <a href="/public/addGames.html">Add Game</a>
-    <a href="/public/serverGames.html">Saved Games</a>
-    <a href="/public/updateGames.html">Update Game</a>
-    <a href="https://github.com/mileshall1/StatTrack" target="_blank">
-      <img src="/public/gitwhite.png" alt="GitHub">
-    </a>
-  </div>
+      <a href="/index.html">📊StatTrack</a>
+      <a href="/public/addGames.html">Add Game</a>
+      <a href="/public/serverGames.html">Saved Games</a>
+      <a href="/public/updateGames.html">Update Game</a>
+      <a href="https://github.com/mileshall1/StatTrack" target="_blank">
+        <img src="/public/gitwhite.png" alt="GitHub">
+      </a>
+    </div>
 
     <h1 class="page-title">Saved NBA Game Items (REST GET)</h1>
 
     <div class="card">
-      <button id="clearGamesBtn" class="button" type="button">CLEAR ALL</button>
       <p id="status" class="status">Loading data from /api/games...</p>
       <div class="table-wrap">
         <table>
@@ -34,6 +33,7 @@
               <th>PTS</th>
               <th>REB</th>
               <th>AST</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody id="gamesBody"></tbody>
@@ -44,15 +44,39 @@
     <script>
       const statusEl = document.getElementById("status");
       const gamesBody = document.getElementById("gamesBody");
-      const clearGamesBtn = document.getElementById("clearGamesBtn");
 
       const buildApiUrl = (path) => {
-        const isLocalExpress = window.location.protocol.startsWith("http") && window.location.port === "3000";
+        const isLocalExpress =
+          window.location.protocol.startsWith("http") &&
+          window.location.port === "3000";
+
         if (isLocalExpress) {
           return path;
         }
         return `http://localhost:3000${path}`;
       };
+
+      async function deleteGame(id) {
+        const shouldDelete = window.confirm(`Delete game with ID ${id}?`);
+        if (!shouldDelete) {
+          return;
+        }
+
+        try {
+          const response = await fetch(buildApiUrl(`/api/games/${id}`), {
+            method: "DELETE"
+          });
+
+          if (!response.ok) {
+            throw new Error("Delete request failed");
+          }
+
+          statusEl.textContent = `Game ${id} was deleted.`;
+          loadGames();
+        } catch (error) {
+          statusEl.textContent = "Unable to delete the selected game.";
+        }
+      }
 
       async function loadGames() {
         try {
@@ -66,47 +90,35 @@
 
           for (const game of games) {
             const row = document.createElement("tr");
+
             row.innerHTML = `
-              <td>${game.id}</td>
+              <td>${game._id}</td>
               <td>${game.date}</td>
               <td>${game.player}</td>
               <td>${game.opponent}</td>
               <td>${game.points}</td>
               <td>${game.rebounds}</td>
               <td>${game.assists}</td>
+              <td>
+                <button class="button delete-btn" data-id="${game._id}" type="button">Delete</button>
+              </td>
             `;
+
             gamesBody.appendChild(row);
           }
+
+          const deleteButtons = document.querySelectorAll(".delete-btn");
+          deleteButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+              deleteGame(button.dataset.id);
+            });
+          });
 
           statusEl.textContent = `Loaded ${games.length} items.`;
         } catch (error) {
           statusEl.textContent = "Unable to load server data.";
         }
       }
-
-      clearGamesBtn.addEventListener("click", async () => {
-        const shouldClear = window.confirm("Clear all saved games?");
-        if (!shouldClear) {
-          return;
-        }
-
-        try {
-          let response = await fetch(buildApiUrl("/api/games"), { method: "DELETE" });
-
-          if (!response.ok) {
-            response = await fetch(buildApiUrl("/api/games/clear"), { method: "POST" });
-          }
-
-          if (!response.ok) {
-            throw new Error("Clear request failed");
-          }
-
-          await loadGames();
-          statusEl.textContent = "All saved games were cleared.";
-        } catch {
-          statusEl.textContent = "Unable to clear saved games. Make sure Express is running on http://localhost:3000.";
-        }
-      });
 
       loadGames();
     </script>
